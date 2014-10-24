@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public class NetworkManager : MonoBehaviour
 {
 
     float btnX, btnY, btnW, btnH;
-    private string GameName = "Galaga_Networking";
+    string GameName = "Galaga_Networking";
+    private bool _refreshing;
 
 
     void OnServerInitialized()
@@ -23,7 +25,14 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    void RefreshHost()
+    {
+        Debug.Log("Refresh Host");
+        MasterServer.RequestHostList(GameName);
+        _refreshing = true;
+        Debug.Log(MasterServer.PollHostList().Length);
 
+    }
 
     void OnGUI()
     {
@@ -33,14 +42,21 @@ public class NetworkManager : MonoBehaviour
         if (startServer)
         {
             Debug.Log("Server started");
-            Network.InitializeServer(2, 25001, !Network.HavePublicAddress());
-            MasterServer.RegisterHost(GameName, "Galaga", "Multiplayer Game");
+            var useNat = !Network.HavePublicAddress();
+            try
+            {
+                Network.InitializeServer(1, 25001, useNat);
+                MasterServer.RegisterHost(GameName, "Galaga", "Multiplayer Game");
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
         }
 
-        if (refreshHost)
-        {
-            Debug.Log("Refresh Host");
-        }
+        if (refreshHost) 
+            RefreshHost();
+
     }
 
     // Use this for initialization
