@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
-    public class NetworkManager : ScriptableObject
+    public class NetworkManager : MonoBehaviour
     {
         public GameObject PlayerGameObject;
 
@@ -22,7 +22,20 @@ namespace Assets.Scripts
         void OnConnectedToServer()
         {
             spawnPlayer();
+            OnPlayerIn(gameObject);
+
         }
+        public delegate void EventHandler(GameObject e);
+        public static event EventHandler PlayerIn;
+
+        static void OnPlayerIn(GameObject e)
+        {
+            if (PlayerIn != null)
+                PlayerIn(e);
+        }
+
+
+
 
         void OnPlayerDisconnected(NetworkPlayer player)
         {

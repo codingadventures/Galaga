@@ -14,12 +14,12 @@ namespace Assets.Scripts
                 return;
 
             if (other.tag.Equals("Player"))
-                Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
+                GameObjectController.Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
 
-            Instantiate(Explosion, transform.position, transform.rotation);
+            GameObjectController.Instantiate(Explosion, transform.position, transform.rotation);
             Debug.Log(other.name);
-            Destroy(gameObject);
-            Destroy(other.gameObject);
+            GameObjectController.Destroy(gameObject);
+            GameObjectController.Destroy(other.gameObject);
         }
 
 

@@ -5,81 +5,121 @@ using Random = UnityEngine.Random;
 
 namespace Assets.Scripts
 {
+    public enum GameType
+    {
+        None,
+        Single,
+        Multiplayer
+    }
     public class GameController : MonoBehaviour
     {
         #region [ Public Fields ]
+
+        public GameObject NetworkManager;
         public GameObject Hazard;
-        public NetworkManager NetworkManager;
         public Transform SpawnValues;
         public bool IsGameStarted;
+        public float SpawnTime;
+
         #endregion
 
         #region [ Private Fields  ]
 
-        float _btnX, _btnY, _btnW, _btnH;
-
+        private float _btnX, _btnY, _btnW, _btnH;
+        private float _spawnDeltaTime;
+        private GameType _gameType;
         #endregion
-
-
-        void Start()
+        void OnDisable()
         {
-            NetworkManager = ScriptableObject.CreateInstance<NetworkManager>();
+            Scripts.NetworkManager.PlayerIn -= OnPlayer;
+        }
+
+        void OnEnable()
+        {
+            Scripts.NetworkManager.PlayerIn += OnPlayer;
+        }
+
+
+
+
+        private void Start()
+        {
             _btnX = Screen.width * 0.01f;
             _btnY = Screen.width * 0.01f;
             _btnW = 100f;
             _btnH = 50f;
-            StartCoroutine(SpawnWaves());
+            _spawnDeltaTime = SpawnTime;
+
+            // StartCoroutine(SpawnWaves());
         }
 
-
-
-        IEnumerator SpawnWaves()
+        private void OnPlayer(GameObject g)
         {
-            yield return new WaitForSeconds(1);
-            if (!IsGameStarted) yield break;
-            
-            while (true)
-            {
-                yield return new WaitForSeconds(1);
-
-                for (var i = 0; i < 3; i++)
-                {
-                    var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x), SpawnValues.position.y, SpawnValues.position.z);
-                    GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
-                    yield return new WaitForSeconds(1);
-                }
-            }
+            IsGameStarted = true;
+            Debug.Log("Game Started, Player Connected");
         }
 
 
-        void OnGUI()
+        private void OnGUI()
         {
             if (Network.isClient || Network.isServer) return;
 
-            var startGame = GUI.Button(new Rect(_btnX, _btnY, _btnW, _btnH), "Start New Game");
-            var joinGame = GUI.Button(new Rect(_btnX, _btnY + 100f, _btnW, _btnH), "Joing Game");
+            var startSinglePlayer = GUI.Button(new Rect(_btnX, _btnY, _btnW, _btnH), "Start New Game");
+            var startMultiplayer = GUI.Button(new Rect(_btnX, _btnY + 100, _btnW, _btnH), "Start Multiplayer Game");
+            var joinGame = GUI.Button(new Rect(_btnX, _btnY + 200f, _btnW, _btnH), "Join Game");
 
-            if (startGame)
+            if (startMultiplayer)
             {
-                NetworkManager.StartServer();
-
+                NetworkManager.GetComponent<NetworkManager>().StartServer();
+                _gameType = GameType.Multiplayer; ;
                 Debug.Log("Game/Server started");
+
+            }
+
+            if (startSinglePlayer)
+            {
+                _gameType = GameType.Single;
                 IsGameStarted = true;
             }
 
             if (joinGame)
             {
-                NetworkManager.RefreshHost();
+                NetworkManager.GetComponent<NetworkManager>().RefreshHost();
+                _gameType = GameType.Multiplayer;
             }
 
-            NetworkManager.GetAvailableGames(_btnX, _btnY, _btnW, _btnH);
+            NetworkManager.GetComponent<NetworkManager>().GetAvailableGames(_btnX, _btnY, _btnW, _btnH);
 
         }
 
-
-        void Update()
+        private void SwarmAsteroid()
         {
 
+            _spawnDeltaTime -= Time.deltaTime;
+
+            if (_spawnDeltaTime <= 0)
+            {
+                for (var i = 0; i < 3; i++)
+                {
+                    var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
+                        SpawnValues.position.y, SpawnValues.position.z);
+                    GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
+                }
+                _spawnDeltaTime = SpawnTime;
+            }
+
+        }
+
+        private void Update()
+        {
+            if (!IsGameStarted) return;
+
+            if (_gameType != GameType.Multiplayer) return;
+            
+            if (Network.isServer)
+            {
+                SwarmAsteroid();
+            }
         }
     }
 }
