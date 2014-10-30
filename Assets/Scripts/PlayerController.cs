@@ -10,9 +10,12 @@ namespace Assets.Scripts
         public float Tilt;
         public GameObject Shot;
         public Transform ShotSpawn;
-
+        public int Lives;
         public float FireRate;
         private float _nextFire;
+
+
+
         /// <summary>
         /// This method is called automatically by unity at each physics step. Code executed once per physics step.
         /// </summary>
@@ -40,23 +43,20 @@ namespace Assets.Scripts
         /// <summary>
         /// Updates every frame our scene.
         /// </summary>
-        void Update()
+        private void Update()
         {
             if (!networkView.isMine)
             {
                 enabled = false;
                 return;
             }
-            
+
             if (Input.GetButton("Fire1") && Time.time > _nextFire)
             {
                 _nextFire = Time.time + FireRate;
-                var clone = Network.Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation,0) as GameObject;
+                var clone = GameObjectController.Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation);
             }
 
         }
-
-
-
     }
 }

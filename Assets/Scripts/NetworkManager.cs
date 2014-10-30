@@ -7,6 +7,8 @@ namespace Assets.Scripts
     {
         public GameObject PlayerGameObject;
 
+        public delegate void EventHandler(NetworkPlayer e);
+        public static event EventHandler PlayerConnected;
 
         private HostData[] _hostData;
         private const string GameName = "Galaga_Networking";
@@ -16,22 +18,26 @@ namespace Assets.Scripts
         void OnServerInitialized()
         {
             Debug.Log("Server Initialized");
-            spawnPlayer();
+            SpawnPlayer();
 
         }
         void OnConnectedToServer()
         {
-            spawnPlayer();
-            OnPlayerIn(gameObject);
-
+            SpawnPlayer();
+             
         }
-        public delegate void EventHandler(GameObject e);
-        public static event EventHandler PlayerIn;
 
-        static void OnPlayerIn(GameObject e)
+
+        //static void OnPlayerConnected(GameObject e)
+        //{
+        //    if (PlayerConnected != null)
+        //        PlayerConnected(e);
+        //}
+
+        void OnPlayerConnected(NetworkPlayer player)
         {
-            if (PlayerIn != null)
-                PlayerIn(e);
+            //if (PlayerConnected != null)
+            //    PlayerConnected(player);
         }
 
 
@@ -185,11 +191,9 @@ namespace Assets.Scripts
         }
 
 
-        private void spawnPlayer()
+        private void SpawnPlayer()
         {
-
             Network.Instantiate(PlayerGameObject, new Vector3(0, 0), Quaternion.identity, 0);
-
         }
 
     }

@@ -29,16 +29,7 @@ namespace Assets.Scripts
         private float _spawnDeltaTime;
         private GameType _gameType;
         #endregion
-        void OnDisable()
-        {
-            Scripts.NetworkManager.PlayerIn -= OnPlayer;
-        }
-
-        void OnEnable()
-        {
-            Scripts.NetworkManager.PlayerIn += OnPlayer;
-        }
-
+     
 
 
 
@@ -52,12 +43,18 @@ namespace Assets.Scripts
 
             // StartCoroutine(SpawnWaves());
         }
+ 
 
-        private void OnPlayer(GameObject g)
+        void OnPlayerConnected(NetworkPlayer player)
         {
+            Debug.Log("Player Connected");
             IsGameStarted = true;
-            Debug.Log("Game Started, Player Connected");
         }
+        void OnConnectedToServer()
+        {
+            Debug.Log("Connected to Server");
+        }
+
 
 
         private void OnGUI()
@@ -99,7 +96,7 @@ namespace Assets.Scripts
 
             if (_spawnDeltaTime <= 0)
             {
-                for (var i = 0; i < 3; i++)
+                for (var i = 0; i < 2; i++)
                 {
                     var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                         SpawnValues.position.y, SpawnValues.position.z);
@@ -115,7 +112,7 @@ namespace Assets.Scripts
             if (!IsGameStarted) return;
 
             if (_gameType != GameType.Multiplayer) return;
-            
+
             if (Network.isServer)
             {
                 SwarmAsteroid();

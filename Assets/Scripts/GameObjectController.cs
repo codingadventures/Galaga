@@ -16,13 +16,14 @@ namespace Assets.Scripts
 
             switch (Network.peerType)
             {
-                case NetworkPeerType.Disconnected: 
+                case NetworkPeerType.Disconnected:
                     ret = Object.Instantiate(objectToInstantiate, position, rotation) as GameObject;
                     break;
                 case NetworkPeerType.Server:
                 case NetworkPeerType.Client:
-                    ret = Network.Instantiate(objectToInstantiate, position, rotation, group) as GameObject;
-                   
+                    if (Network.isServer)
+                        ret = Network.Instantiate(objectToInstantiate, position, rotation, group) as GameObject;
+
                     break;
                 case NetworkPeerType.Connecting:
                     break;
@@ -38,11 +39,12 @@ namespace Assets.Scripts
             switch (Network.peerType)
             {
                 case NetworkPeerType.Disconnected:
-                    Network.Destroy(objectToDestroy);
+                    Object.Destroy(objectToDestroy);
                     break;
                 case NetworkPeerType.Server:
                 case NetworkPeerType.Client:
-                    Object.Destroy(objectToDestroy);
+                    if (Network.isServer)
+                        Network.Destroy(objectToDestroy.networkView.viewID);
                     break;
                 case NetworkPeerType.Connecting:
                     break;
