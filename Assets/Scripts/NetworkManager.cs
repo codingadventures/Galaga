@@ -14,13 +14,8 @@ namespace Assets.Scripts
         void OnServerInitialized()
         {
             Debug.Log("Server Initialized");
-            //SpawnPlayer();
-
         }
-        void OnConnectedToServer()
-        {
-            //SpawnPlayer();
-        }
+        
          
 
         void OnPlayerDisconnected(NetworkPlayer player)

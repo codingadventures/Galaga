@@ -23,7 +23,7 @@ namespace Assets.Scripts
                 Debug.Log(other.name);
                 GameObjectController.Destroy(gameObject);
                 GameObjectController.Destroy(other.gameObject);
-                Debug.Log(string.Format("Destroyed By Contact - {0} {1}", gameObject.name, other.gameObject.name));
+                Debug.Log(string.Format("Destroyed By Contact - {0} Collided with {1}", gameObject.name, other.gameObject.name));
             }
             catch (Exception e)
             {

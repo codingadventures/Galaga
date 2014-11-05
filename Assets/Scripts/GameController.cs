@@ -30,18 +30,9 @@ namespace Assets.Scripts
         private float _spawnDeltaTime;
         private GameType _gameType;
         #endregion
-
-
-
+         
 
        
-
-        void OnPlayerConnected(NetworkPlayer player)
-        {
-            Debug.Log("Player Connected");
-            IsGameStarted = true;
-        }
-
       
 
         #region [ Private Methods ]
@@ -73,9 +64,17 @@ namespace Assets.Scripts
 
         #region [ Monobehaviors ]
 
+        void OnPlayerConnected(NetworkPlayer player)
+        {
+            Debug.Log("Player Connected");
+            IsGameStarted = true;
+        }
+
+
         void OnConnectedToServer()
         {
             Debug.Log("Connected to Server");
+            Network.Instantiate(PlayerGameObject, new Vector3(3, 0), Quaternion.identity, 0);
         }
 
         void OnServerInitialized()

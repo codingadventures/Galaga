@@ -9,48 +9,65 @@ namespace Assets.Scripts
 {
     public class GameObjectController
     {
+        private static int _internalCounter;
 
         public static GameObject Instantiate(GameObject objectToInstantiate, Vector3 position, Quaternion rotation, int group = 0)
         {
             GameObject ret = null;
 
-            switch (Network.peerType)
+            if (IsConnected())
             {
-                case NetworkPeerType.Disconnected:
-                    ret = Object.Instantiate(objectToInstantiate, position, rotation) as GameObject;
-                    break;
-                case NetworkPeerType.Server:
-                case NetworkPeerType.Client:
-                    if (Network.isServer)
-                        ret = Network.Instantiate(objectToInstantiate, position, rotation, group) as GameObject;
+                if (Network.isServer)
+                    ret = Network.Instantiate(objectToInstantiate, position, rotation, group) as GameObject;
 
-                    break;
-                case NetworkPeerType.Connecting:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
+            else
+                ret = Object.Instantiate(objectToInstantiate, position, rotation) as GameObject;
+
+            if (ret == null) return null;
+
+            var name = ret.name.Replace("clone", string.Empty);
+            ret.name = string.Format("{0} - #{1}  NetworkView - {2}", name, _internalCounter++, ret.networkView != null ? ret.networkView.viewID.ToString() : "None");
 
             return ret;
         }
 
         public static void Destroy(GameObject objectToDestroy)
         {
+            Debug.Log(string.Format("GameObject {0} is about to be destroyed", objectToDestroy.name));
+
+            if (IsConnected())
+            {
+                if (Network.isServer && objectToDestroy.networkView != null)
+                {
+                    Network.Destroy(objectToDestroy.networkView.viewID);
+                    Debug.Log(string.Format("GameObject {0} IsServer True - Network Destroyed", objectToDestroy.name));
+                }
+                //else
+                //{
+                //    Object.Destroy(objectToDestroy);
+                //    Debug.Log(string.Format("GameObject {0} IsServer False IsConnected True - Destroyed", objectToDestroy.name));
+                //}
+            }
+            else
+                Object.Destroy(objectToDestroy);
+        }
+
+        public static bool IsConnected()
+        {
+
             switch (Network.peerType)
             {
                 case NetworkPeerType.Disconnected:
-                    Object.Destroy(objectToDestroy);
-                    break;
+                    return false;
                 case NetworkPeerType.Server:
                 case NetworkPeerType.Client:
-                    if (Network.isServer)
-                        Network.Destroy(objectToDestroy.networkView.viewID);
-                    break;
                 case NetworkPeerType.Connecting:
-                    break;
+                    return true;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
         }
 
 
