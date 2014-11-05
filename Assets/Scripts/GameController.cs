@@ -30,10 +30,6 @@ namespace Assets.Scripts
         private float _spawnDeltaTime;
         private GameType _gameType;
         #endregion
-         
-
-       
-      
 
         #region [ Private Methods ]
 
@@ -70,7 +66,9 @@ namespace Assets.Scripts
             IsGameStarted = true;
         }
 
-
+        /// <summary>
+        /// Specifically used when a client connects to a server
+        /// </summary>
         void OnConnectedToServer()
         {
             Debug.Log("Connected to Server");
