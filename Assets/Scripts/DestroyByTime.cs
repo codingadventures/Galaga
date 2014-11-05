@@ -13,6 +13,7 @@ namespace Assets.Scripts
         void Start()
         {
             Destroy(gameObject, LifeTime);
+            Debug.Log("Object" + gameObject.name + " Destroyed by time");
         }
     }
 }

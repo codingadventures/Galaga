@@ -5,11 +5,7 @@ namespace Assets.Scripts
 {
     public class NetworkManager : MonoBehaviour
     {
-        public GameObject PlayerGameObject;
-
-        public delegate void EventHandler(NetworkPlayer e);
-        public static event EventHandler PlayerConnected;
-
+       
         private HostData[] _hostData;
         private const string GameName = "Galaga_Networking";
         private bool _refreshing;
@@ -18,30 +14,14 @@ namespace Assets.Scripts
         void OnServerInitialized()
         {
             Debug.Log("Server Initialized");
-            SpawnPlayer();
+            //SpawnPlayer();
 
         }
         void OnConnectedToServer()
         {
-            SpawnPlayer();
-             
+            //SpawnPlayer();
         }
-
-
-        //static void OnPlayerConnected(GameObject e)
-        //{
-        //    if (PlayerConnected != null)
-        //        PlayerConnected(e);
-        //}
-
-        void OnPlayerConnected(NetworkPlayer player)
-        {
-            //if (PlayerConnected != null)
-            //    PlayerConnected(player);
-        }
-
-
-
+         
 
         void OnPlayerDisconnected(NetworkPlayer player)
         {
@@ -191,10 +171,7 @@ namespace Assets.Scripts
         }
 
 
-        private void SpawnPlayer()
-        {
-            Network.Instantiate(PlayerGameObject, new Vector3(0, 0), Quaternion.identity, 0);
-        }
+       
 
     }
 }

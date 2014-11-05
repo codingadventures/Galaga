@@ -16,6 +16,7 @@ namespace Assets.Scripts
         #region [ Public Fields ]
 
         public GameObject NetworkManager;
+        public GameObject PlayerGameObject; 
         public GameObject Hazard;
         public Transform SpawnValues;
         public bool IsGameStarted;
@@ -29,9 +30,58 @@ namespace Assets.Scripts
         private float _spawnDeltaTime;
         private GameType _gameType;
         #endregion
-     
 
 
+
+
+       
+
+        void OnPlayerConnected(NetworkPlayer player)
+        {
+            Debug.Log("Player Connected");
+            IsGameStarted = true;
+        }
+
+      
+
+        #region [ Private Methods ]
+
+        private void SwarmAsteroid()
+        {
+
+            _spawnDeltaTime -= Time.deltaTime;
+
+            if (_spawnDeltaTime <= 0)
+            {
+                for (var i = 0; i < 2; i++)
+                {
+                    var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
+                        SpawnValues.position.y, SpawnValues.position.z);
+                    GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
+                }
+                _spawnDeltaTime = SpawnTime;
+            }
+
+        }
+
+        private void SpawnPlayer()
+        {
+            GameObjectController.Instantiate(PlayerGameObject, new Vector3(0, 0), Quaternion.identity, 0);
+        }
+
+        #endregion
+
+        #region [ Monobehaviors ]
+
+        void OnConnectedToServer()
+        {
+            Debug.Log("Connected to Server");
+        }
+
+        void OnServerInitialized()
+        {
+            SpawnPlayer();
+        }
 
         private void Start()
         {
@@ -40,21 +90,7 @@ namespace Assets.Scripts
             _btnW = 100f;
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
-
-            // StartCoroutine(SpawnWaves());
         }
- 
-
-        void OnPlayerConnected(NetworkPlayer player)
-        {
-            Debug.Log("Player Connected");
-            IsGameStarted = true;
-        }
-        void OnConnectedToServer()
-        {
-            Debug.Log("Connected to Server");
-        }
-
 
 
         private void OnGUI()
@@ -77,6 +113,7 @@ namespace Assets.Scripts
             {
                 _gameType = GameType.Single;
                 IsGameStarted = true;
+                SpawnPlayer();
             }
 
             if (joinGame)
@@ -86,37 +123,32 @@ namespace Assets.Scripts
             }
 
             NetworkManager.GetComponent<NetworkManager>().GetAvailableGames(_btnX, _btnY, _btnW, _btnH);
-
         }
 
-        private void SwarmAsteroid()
-        {
 
-            _spawnDeltaTime -= Time.deltaTime;
-
-            if (_spawnDeltaTime <= 0)
-            {
-                for (var i = 0; i < 2; i++)
-                {
-                    var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
-                        SpawnValues.position.y, SpawnValues.position.z);
-                    GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
-                }
-                _spawnDeltaTime = SpawnTime;
-            }
-
-        }
 
         private void Update()
         {
             if (!IsGameStarted) return;
 
-            if (_gameType != GameType.Multiplayer) return;
-
-            if (Network.isServer)
+            switch (_gameType)
             {
-                SwarmAsteroid();
+                case GameType.None:
+                    break;
+                case GameType.Single:
+                    SwarmAsteroid();
+                    break;
+                case GameType.Multiplayer:
+                    if (Network.isServer)
+                    {
+                        SwarmAsteroid();
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
+
+        #endregion
     }
 }

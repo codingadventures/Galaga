@@ -11,7 +11,11 @@ namespace Assets.Scripts
         /// <param name="other">The other's game object collider.</param>
         void OnTriggerExit(Collider other)
         {
-            Destroy(other.gameObject);
+            GameObjectController.Destroy(other.gameObject);
+             
+            Debug.Log(string.Format("Destroyed By World Boundary {3} - Position ({0},{1},{2}", other.transform.position.x, other.transform.position.y,
+                other.transform.position.z, other.gameObject.name));
+
         }
 
 
