@@ -29,6 +29,7 @@ namespace Assets.Scripts
         private float _btnX, _btnY, _btnW, _btnH;
         private float _spawnDeltaTime;
         private GameType _gameType;
+        private Spline _spline;
         #endregion
 
         #region [ Private Methods ]
@@ -91,9 +92,25 @@ namespace Assets.Scripts
             //Initialize Splines Path
             //start position, I have it
             //end z = 13, 14.5, 16.5
-            var spline = new Spline();
+            _spline = new Spline();
+            _spline.AddKeyframe(0, SpawnValues.position);
+            Vector3 point1 = SpawnValues.position;
+            point1.x -= 3*Mathf.Sign(point1.x);
+            point1.z -= 4;
+            _spline.AddKeyframe(0.3f, point1);
 
-           // spline.AddKeyframe(0,new Vector3());
+            Vector3 point2 = SpawnValues.position;
+            point2.x -= 8 * Mathf.Sign(point2.x);
+            point2.z -= 8;
+
+            _spline.AddKeyframe(0.6f, point2);
+
+            Vector3 point3 = SpawnValues.position;
+            point3.x -= 3 * Mathf.Sign(point3.x);
+            point3.z -= 11;
+
+            _spline.AddKeyframe(1.0f, point3);
+
         }
 
 
@@ -134,6 +151,8 @@ namespace Assets.Scripts
         private void Update()
         {
             if (!IsGameStarted) return;
+
+            _spline.Update(Time.deltaTime);
 
             switch (_gameType)
             {

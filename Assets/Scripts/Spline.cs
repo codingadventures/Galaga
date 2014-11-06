@@ -11,9 +11,9 @@ namespace Assets.Scripts
         private struct KeyFrame
         {
             public float Time { get; private set; }
-            public Vector3 Position { get; private set; } 
+            public Vector3 Position { get; private set; }
 
-         
+
             public KeyFrame(Vector3 position, float time)
                 : this()
             {
@@ -25,8 +25,8 @@ namespace Assets.Scripts
         List<KeyFrame> _keyframes;
         float _timer;
 
-         
-        public void AddKeyframe(float t, Vector3 keyFramePosition) 
+
+        public void AddKeyframe(float t, Vector3 keyFramePosition)
         {
             _keyframes.Add(new KeyFrame(keyFramePosition, t));
         }
@@ -62,7 +62,7 @@ namespace Assets.Scripts
             return CubicLerp(_keyframes[prevKey - 1].Position, _keyframes[prevKey].Position, _keyframes[nextKey].Position, _keyframes[nextKey + 1].Position, t);
         }
 
-        void Update(float deltaTime)
+        public void Update(float deltaTime)
         {
             _timer += deltaTime / 1000;
         }

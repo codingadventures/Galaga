@@ -15,7 +15,6 @@ namespace Assets.Scripts
              
             Debug.Log(string.Format("Destroyed By World Boundary {3} - Position ({0},{1},{2}", other.transform.position.x, other.transform.position.y,
                 other.transform.position.z, other.gameObject.name));
-
         }
 
 
