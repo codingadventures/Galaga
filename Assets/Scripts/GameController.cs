@@ -87,6 +87,13 @@ namespace Assets.Scripts
             _btnW = 100f;
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
+
+            //Initialize Splines Path
+            //start position, I have it
+            //end z = 13, 14.5, 16.5
+            var spline = new Spline();
+
+           // spline.AddKeyframe(0,new Vector3());
         }
 
 
@@ -145,6 +152,12 @@ namespace Assets.Scripts
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        #endregion
+
+        #region [ Private Class ]
+
+
 
         #endregion
     }

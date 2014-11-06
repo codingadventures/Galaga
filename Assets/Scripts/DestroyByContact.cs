@@ -11,7 +11,7 @@ namespace Assets.Scripts
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag.Equals("WorldBoundary"))
+            if (other.tag.Equals("WorldBoundary") || other.tag == "Enemy")
                 return;
 
             if (other.tag.Equals("Player"))
@@ -19,7 +19,9 @@ namespace Assets.Scripts
 
             try
             {
-                GameObjectController.Instantiate(Explosion, transform.position, transform.rotation);
+                if (Explosion != null)
+                    GameObjectController.Instantiate(Explosion, transform.position, transform.rotation);
+                
                 Debug.Log(other.name);
                 GameObjectController.Destroy(gameObject);
                 GameObjectController.Destroy(other.gameObject);
@@ -30,8 +32,5 @@ namespace Assets.Scripts
                 Debug.Log(e.Message);
             }
         }
-
-
-
     }
 }
