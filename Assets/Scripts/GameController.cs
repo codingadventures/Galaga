@@ -19,9 +19,8 @@ namespace Assets.Scripts
         public GameObject PlayerGameObject; 
         public GameObject Hazard;
         public Transform SpawnValues;
-        public bool IsGameStarted;
         public float SpawnTime;
-
+        public int TotalNumEnemies;
         #endregion
 
         #region [ Private Fields  ]
@@ -29,7 +28,8 @@ namespace Assets.Scripts
         private float _btnX, _btnY, _btnW, _btnH;
         private float _spawnDeltaTime;
         private GameType _gameType;
-        private Spline _spline;
+        private bool _isGameStarted;
+        public int EnemiesSpawned { get; private set; }
         #endregion
 
         #region [ Private Methods ]
@@ -39,13 +39,15 @@ namespace Assets.Scripts
 
             _spawnDeltaTime -= Time.deltaTime;
 
-            if (_spawnDeltaTime <= 0)
+            if (_spawnDeltaTime <= 0 && EnemiesSpawned < TotalNumEnemies)
             {
                 for (var i = 0; i < 2; i++)
                 {
                     var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                         SpawnValues.position.y, SpawnValues.position.z);
                     GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
+                    EnemiesSpawned++;
+
                 }
                 _spawnDeltaTime = SpawnTime;
             }
@@ -64,7 +66,7 @@ namespace Assets.Scripts
         void OnPlayerConnected(NetworkPlayer player)
         {
             Debug.Log("Player Connected");
-            IsGameStarted = true;
+            _isGameStarted = true;
         }
 
         /// <summary>
@@ -89,27 +91,6 @@ namespace Assets.Scripts
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
 
-            //Initialize Splines Path
-            //start position, I have it
-            //end z = 13, 14.5, 16.5
-            _spline = new Spline();
-            _spline.AddKeyframe(0, SpawnValues.position);
-            Vector3 point1 = SpawnValues.position;
-            point1.x -= 3*Mathf.Sign(point1.x);
-            point1.z -= 4;
-            _spline.AddKeyframe(0.3f, point1);
-
-            Vector3 point2 = SpawnValues.position;
-            point2.x -= 8 * Mathf.Sign(point2.x);
-            point2.z -= 8;
-
-            _spline.AddKeyframe(0.6f, point2);
-
-            Vector3 point3 = SpawnValues.position;
-            point3.x -= 3 * Mathf.Sign(point3.x);
-            point3.z -= 11;
-
-            _spline.AddKeyframe(1.0f, point3);
 
         }
 
@@ -133,7 +114,7 @@ namespace Assets.Scripts
             if (startSinglePlayer)
             {
                 _gameType = GameType.Single;
-                IsGameStarted = true;
+                _isGameStarted = true;
                 SpawnPlayer();
             }
 
@@ -150,9 +131,8 @@ namespace Assets.Scripts
 
         private void Update()
         {
-            if (!IsGameStarted) return;
-
-            _spline.Update(Time.deltaTime);
+            if (!_isGameStarted) return;
+             
 
             switch (_gameType)
             {

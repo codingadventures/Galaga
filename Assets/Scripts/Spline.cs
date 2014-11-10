@@ -22,8 +22,13 @@ namespace Assets.Scripts
             }
         }
 
-        List<KeyFrame> _keyframes;
+        readonly List<KeyFrame> _keyframes;
         float _timer;
+
+        public Spline()
+        {
+            _keyframes = new List<KeyFrame>();
+        }
 
 
         public void AddKeyframe(float t, Vector3 keyFramePosition)
@@ -31,7 +36,7 @@ namespace Assets.Scripts
             _keyframes.Add(new KeyFrame(keyFramePosition, t));
         }
 
-        Vector3 GetPosition()
+        public Vector3 GetPosition()
         {
             var reset = true;
             var prevKey = 1;
@@ -64,7 +69,7 @@ namespace Assets.Scripts
 
         public void Update(float deltaTime)
         {
-            _timer += deltaTime / 1000;
+            _timer += deltaTime;
         }
 
         private static Vector3 CubicLerp(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 v3, float t)
