@@ -21,7 +21,7 @@ namespace Assets.Scripts
         /// </summary>
         void FixedUpdate()
         {
-            if (!networkView.isMine) return;
+            if (GameObjectController.IsConnected() && !networkView.isMine) return;
 
             //I'm only using the horizontal component. GetAxis returns only 0-1, so movement is per unit.
             var moveHorizontal = Input.GetAxis("Horizontal");
@@ -45,7 +45,7 @@ namespace Assets.Scripts
         /// </summary>
         private void Update()
         {
-            if (!networkView.isMine)
+            if (GameObjectController.IsConnected() && !networkView.isMine)
             {
                 enabled = false;
                 return;
@@ -54,7 +54,7 @@ namespace Assets.Scripts
             if (Input.GetButton("Fire1") && Time.time > _nextFire)
             {
                 _nextFire = Time.time + FireRate;
-                var clone = GameObjectController.Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation);
+                var clone = GameObjectController.Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation, ignoreServerCheck: true);
             }
 
         }

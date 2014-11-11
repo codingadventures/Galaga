@@ -11,13 +11,13 @@ namespace Assets.Scripts
     {
         private static int _internalCounter;
 
-        public static GameObject Instantiate(GameObject objectToInstantiate, Vector3 position, Quaternion rotation, int group = 0)
+        public static GameObject Instantiate(GameObject objectToInstantiate, Vector3 position, Quaternion rotation, int group = 0, bool ignoreServerCheck = false)
         {
             GameObject ret = null;
 
             if (IsConnected())
             {
-                if (Network.isServer)
+                if (Network.isServer || ignoreServerCheck)
                     ret = Network.Instantiate(objectToInstantiate, position, rotation, group) as GameObject;
 
             }
@@ -32,13 +32,13 @@ namespace Assets.Scripts
             return ret;
         }
 
-        public static void Destroy(GameObject objectToDestroy)
+        public static void Destroy(GameObject objectToDestroy, bool ignoreServerCheck = false)
         {
             Debug.Log(string.Format("GameObject {0} is about to be destroyed", objectToDestroy.name));
 
             if (IsConnected())
             {
-                if (Network.isServer && objectToDestroy.networkView != null)
+                if ((Network.isServer || ignoreServerCheck) && objectToDestroy.networkView != null)
                 {
                     Network.Destroy(objectToDestroy.networkView.viewID);
                     Debug.Log(string.Format("GameObject {0} IsServer True - Network Destroyed", objectToDestroy.name));

@@ -11,7 +11,7 @@ namespace Assets.Scripts
 
         void Start()
         {
-            InvokeRepeating("Fire", Delay, FireRate);
+            //InvokeRepeating("Fire", Delay, FireRate);
         }
 
         void Fire()

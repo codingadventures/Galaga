@@ -16,7 +16,8 @@ namespace Assets.Scripts
         #region [ Public Fields ]
 
         public GameObject NetworkManager;
-        public GameObject PlayerGameObject; 
+        public GameObject Player1;
+        public GameObject Player2;
         public GameObject Hazard;
         public Transform SpawnValues;
         public float SpawnTime;
@@ -41,14 +42,12 @@ namespace Assets.Scripts
 
             if (_spawnDeltaTime <= 0 && EnemiesSpawned < TotalNumEnemies)
             {
-                for (var i = 0; i < 2; i++)
-                {
-                    var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
-                        SpawnValues.position.y, SpawnValues.position.z);
-                    GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
-                    EnemiesSpawned++;
 
-                }
+                var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
+                    SpawnValues.position.y, SpawnValues.position.z);
+                GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
+                EnemiesSpawned++;
+
                 _spawnDeltaTime = SpawnTime;
             }
 
@@ -56,7 +55,7 @@ namespace Assets.Scripts
 
         private void SpawnPlayer()
         {
-            GameObjectController.Instantiate(PlayerGameObject, new Vector3(0, 0), Quaternion.identity, 0);
+            GameObjectController.Instantiate(Player1, new Vector3(0, 0), Quaternion.identity, 0);
         }
 
         #endregion
@@ -75,7 +74,7 @@ namespace Assets.Scripts
         void OnConnectedToServer()
         {
             Debug.Log("Connected to Server");
-            Network.Instantiate(PlayerGameObject, new Vector3(3, 0), Quaternion.identity, 0);
+            Network.Instantiate(Player2, new Vector3(3, 0), Quaternion.identity, 0);
         }
 
         void OnServerInitialized()
@@ -132,7 +131,7 @@ namespace Assets.Scripts
         private void Update()
         {
             if (!_isGameStarted) return;
-             
+
 
             switch (_gameType)
             {
