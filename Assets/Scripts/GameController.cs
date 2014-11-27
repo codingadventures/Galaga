@@ -93,7 +93,7 @@ namespace Assets.Scripts
             _btnW = 100f;
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
-             LevelManager.SetActive(false);
+            LevelManager.SetActive(false);
             Positions = new Stack<int>();
             for (var i = 7; i > 0; i--)
             {
@@ -164,10 +164,13 @@ namespace Assets.Scripts
 
             if (EnemiesKilled == TotalNumEnemies)
             {
-                Application.LoadLevel(0);
-                LevelManager.SetActive(true);
+                //Application.LoadLevel(0);
+                //LevelManager.SetActive(true);
 
-                LevelManager.GetComponent<TextMesh>().text +=" 2";
+                //LevelManager.GetComponent<TextMesh>().text +=" 2";
+
+                EnemiesSpawned = 0;
+                SwarmEnemy();
             }
         }
 
