@@ -8,13 +8,15 @@ namespace Assets.Scripts
 {
     public class Spline
     {
-        public static event EventHandler SplineEnd;
+        private readonly bool _cycle;
+        //public static event EventHandler SplineEnd;
 
-        private static void OnSplineEnd()
-        {
-            EventHandler handler = SplineEnd;
-            if (handler != null) handler(null, EventArgs.Empty);
-        }
+        //private static void OnSplineEnd()
+        //{
+        //    EventHandler handler = SplineEnd;
+        //    if (handler != null) handler(null, EventArgs.Empty);
+        //}
+        public bool End;
 
         private struct KeyFrame
         {
@@ -33,8 +35,9 @@ namespace Assets.Scripts
         readonly List<KeyFrame> _keyframes;
         float _timer;
 
-        public Spline()
+        public Spline(bool cycle = false)
         {
+            _cycle = cycle;
             _keyframes = new List<KeyFrame>();
         }
 
@@ -61,9 +64,14 @@ namespace Assets.Scripts
                 break;
             }
 
+            if (!_cycle && reset)
+            {
+                End = true;
+                return _keyframes[nextKey].Position;
+            }
+
             if (reset)
             {
-                OnSplineEnd();
                 prevKey = 1;
                 nextKey = 2;
                 _timer = 0;
@@ -92,5 +100,5 @@ namespace Assets.Scripts
             return (a0 * t * t2 + a1 * t2 + a2 * t + a3);
         }
     }
-     
+
 }

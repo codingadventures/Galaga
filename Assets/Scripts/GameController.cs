@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -22,6 +22,8 @@ namespace Assets.Scripts
         public Transform SpawnValues;
         public float SpawnTime;
         public int TotalNumEnemies;
+        public Stack<int> Positions; 
+
         #endregion
 
         #region [ Private Fields  ]
@@ -30,23 +32,23 @@ namespace Assets.Scripts
         private float _spawnDeltaTime;
         private GameType _gameType;
         private bool _isGameStarted;
-        public int EnemiesSpawned { get; private set; }
+        public List<GameObject> EnemiesSpawned { get; private set; }
         #endregion
 
         #region [ Private Methods ]
 
-        private void SwarmAsteroid()
+        private void SwarmEnemy()
         {
 
             _spawnDeltaTime -= Time.deltaTime;
 
-            if (_spawnDeltaTime <= 0 && EnemiesSpawned < TotalNumEnemies)
+            if (_spawnDeltaTime <= 0 && EnemiesSpawned.Count < TotalNumEnemies)
             {
 
                 var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                     SpawnValues.position.y, SpawnValues.position.z);
-                GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity, 0);
-                EnemiesSpawned++;
+                var enemy = GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity);
+                EnemiesSpawned.Add(enemy);
 
                 _spawnDeltaTime = SpawnTime;
             }
@@ -89,8 +91,16 @@ namespace Assets.Scripts
             _btnW = 100f;
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
-
-
+            EnemiesSpawned = new List<GameObject>();
+            Positions = new Stack<int>();
+            for (var i = 7; i > 0; i--)
+            {
+                if (i > 0)
+                {
+                    Positions.Push(-i);                    
+                }
+                Positions.Push(i);
+            }
         }
 
 
@@ -138,12 +148,12 @@ namespace Assets.Scripts
                 case GameType.None:
                     break;
                 case GameType.Single:
-                    SwarmAsteroid();
+                    SwarmEnemy();
                     break;
                 case GameType.Multiplayer:
                     if (Network.isServer)
                     {
-                        SwarmAsteroid();
+                        SwarmEnemy();
                     }
                     break;
                 default:
