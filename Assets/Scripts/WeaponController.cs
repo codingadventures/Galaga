@@ -17,6 +17,7 @@ namespace Assets.Scripts
         void Fire()
         {
             GameObjectController.Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation);
+            audio.Play();
         }
     }
 }

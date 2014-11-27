@@ -8,6 +8,14 @@ namespace Assets.Scripts
 {
     public class Spline
     {
+        public static event EventHandler SplineEnd;
+
+        private static void OnSplineEnd()
+        {
+            EventHandler handler = SplineEnd;
+            if (handler != null) handler(null, EventArgs.Empty);
+        }
+
         private struct KeyFrame
         {
             public float Time { get; private set; }
@@ -55,6 +63,7 @@ namespace Assets.Scripts
 
             if (reset)
             {
+                OnSplineEnd();
                 prevKey = 1;
                 nextKey = 2;
                 _timer = 0;
@@ -83,4 +92,5 @@ namespace Assets.Scripts
             return (a0 * t * t2 + a1 * t2 + a2 * t + a3);
         }
     }
+     
 }

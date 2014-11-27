@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -6,20 +8,22 @@ namespace Assets.Scripts
     public class SwarmFormation : MonoBehaviour
     {
         private Spline Spline;
-        public GameObject ITweenPathGameObject;
+        public List<GameObject> ITweenPathGameObjects;
+        private bool _isSwarming;
 
+        
         iTweenPath iTweenPath
         {
-            get { return ITweenPathGameObject.GetComponent<iTweenPath>(); }
+            get
+            {
+                var random = new System.Random();
+                var splineNumber = random.Next(0, 2);
+                return ITweenPathGameObjects[splineNumber].GetComponent<iTweenPath>();
+            }
         }
-        private float currentSpeed;
-        int _angle = 0;
-        int _angleOffset = 3;
-        int _pathCnt = 0;
-        private float _speedScalarX, _speedScalarY;
-        bool _autoDestroy = true;
 
-        readonly int[] _animationPath = { -5, -5, -5, 5, 5, 5, -5, 5, 3, 3, 5, 5, -5 };
+
+
         private GameController _gameControllerObject;
 
         void Start()
@@ -38,54 +42,15 @@ namespace Assets.Scripts
                 Debug.Log("Cannot find 'GameController' script");
             }
 
-
-            //Initialize Splines Path
-            //start position, I have it
-            //end z = 13, 14.5, 16.5
             Spline = new Spline();
-            Spline.AddKeyframe(-1, iTweenPath.nodes[0]);
+            var path = iTweenPath;
+            Spline.AddKeyframe(-1, path.nodes[0]);
 
-            foreach (var vector3 in iTweenPath.nodes)
+            foreach (var vector3 in path.nodes)
             {
                 Spline.AddKeyframe(t++, vector3);
             }
-            Spline.AddKeyframe(t, iTweenPath.nodes[iTweenPath.nodes.Count - 1]);
-        }
-
-
-        private void FixedUpdate()
-        {
-            //if (_gameControllerObject.EnemiesSpawned % 10 == 0)
-            //{
-            //    _angleOffset = _animationPath[_pathCnt];
-            //    _pathCnt++;
-            //    if (_pathCnt > _animationPath.Length - 1)
-            //    {
-            //        _pathCnt = 0;
-            //    }
-            //}
-
-            //_angle += _angleOffset;
-
-            //var angleInRad = Mathf.Deg2Rad * _angle;
-
-            //var speed = new Vector3
-            //{
-            //    x = Mathf.Sin(angleInRad) * 5,
-            //    z = -Mathf.Cos(angleInRad) * 5,
-            //    y = 0
-            //};
-
-
-            //var velocity = new Vector3(speed.x, 0.0f, speed.z);
-
-            //gameObject.transform.position = new Vector3
-            //(
-            //    Mathf.Clamp(velocity.x, -16, 16),
-            //    0.0f,
-            //    Mathf.Clamp(velocity.z, -20, 40)
-            //);
-
+            Spline.AddKeyframe(t, iTweenPath.nodes[path.nodes.Count - 1]);
         }
 
 
@@ -95,8 +60,8 @@ namespace Assets.Scripts
 
 
             gameObject.transform.position = Spline.GetPosition();
-
             Spline.Update(Time.deltaTime);
+
 
         }
     }
