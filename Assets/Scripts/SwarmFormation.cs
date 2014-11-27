@@ -40,7 +40,7 @@ namespace Assets.Scripts
                 Spline.AddKeyframe(t++, vector3);
             }
             var vector = path.nodes[path.nodes.Count - 1];
-            if (_gameControllerObject != null)
+            if (_gameControllerObject != null && _gameControllerObject.Positions.Count > 0)
                 vector.x += _gameControllerObject.Positions.Pop();
             Spline.AddKeyframe(t++, vector);
 

@@ -19,10 +19,11 @@ namespace Assets.Scripts
         public GameObject Player1;
         public GameObject Player2;
         public GameObject Hazard;
+        public GameObject LevelManager;
         public Transform SpawnValues;
         public float SpawnTime;
         public int TotalNumEnemies;
-        public Stack<int> Positions; 
+        public Stack<int> Positions;
 
         #endregion
 
@@ -32,7 +33,8 @@ namespace Assets.Scripts
         private float _spawnDeltaTime;
         private GameType _gameType;
         private bool _isGameStarted;
-        public List<GameObject> EnemiesSpawned { get; private set; }
+        public int EnemiesSpawned { get; private set; }
+        public int EnemiesKilled { get; set; }
         #endregion
 
         #region [ Private Methods ]
@@ -42,13 +44,13 @@ namespace Assets.Scripts
 
             _spawnDeltaTime -= Time.deltaTime;
 
-            if (_spawnDeltaTime <= 0 && EnemiesSpawned.Count < TotalNumEnemies)
+            if (_spawnDeltaTime <= 0 && EnemiesSpawned < TotalNumEnemies)
             {
 
                 var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                     SpawnValues.position.y, SpawnValues.position.z);
                 var enemy = GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity);
-                EnemiesSpawned.Add(enemy);
+                EnemiesSpawned++;
 
                 _spawnDeltaTime = SpawnTime;
             }
@@ -91,13 +93,13 @@ namespace Assets.Scripts
             _btnW = 100f;
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
-            EnemiesSpawned = new List<GameObject>();
+             LevelManager.SetActive(false);
             Positions = new Stack<int>();
             for (var i = 7; i > 0; i--)
             {
                 if (i > 0)
                 {
-                    Positions.Push(-i);                    
+                    Positions.Push(-i);
                 }
                 Positions.Push(i);
             }
@@ -158,6 +160,14 @@ namespace Assets.Scripts
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+
+            if (EnemiesKilled == TotalNumEnemies)
+            {
+                Application.LoadLevel(0);
+                LevelManager.SetActive(true);
+
+                LevelManager.GetComponent<TextMesh>().text +=" 2";
             }
         }
 
