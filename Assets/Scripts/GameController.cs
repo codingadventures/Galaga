@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -11,6 +12,7 @@ namespace Assets.Scripts
         Single,
         Multiplayer
     }
+
     public class GameController : MonoBehaviour
     {
         #region [ Public Fields ]
@@ -35,6 +37,7 @@ namespace Assets.Scripts
         private bool _isGameStarted;
         public int EnemiesSpawned { get; private set; }
         public int EnemiesKilled { get; set; }
+
         #endregion
 
         #region [ Private Methods ]
@@ -66,7 +69,7 @@ namespace Assets.Scripts
 
         #region [ Monobehaviors ]
 
-        void OnPlayerConnected(NetworkPlayer player)
+        private void OnPlayerConnected(NetworkPlayer player)
         {
             Debug.Log("Player Connected");
             _isGameStarted = true;
@@ -75,18 +78,18 @@ namespace Assets.Scripts
         /// <summary>
         /// Specifically used when a client connects to a server
         /// </summary>
-        void OnConnectedToServer()
+        private void OnConnectedToServer()
         {
             Debug.Log("Connected to Server");
             Network.Instantiate(Player2, new Vector3(3, 0), Quaternion.identity, 0);
         }
 
-        void OnServerInitialized()
+        private void OnServerInitialized()
         {
             SpawnPlayer();
         }
 
-        private void Start()
+        void Start()
         {
             _btnX = Screen.width * 0.01f;
             _btnY = Screen.width * 0.01f;
@@ -106,7 +109,7 @@ namespace Assets.Scripts
         }
 
 
-        private void OnGUI()
+        void OnGUI()
         {
             if (Network.isClient || Network.isServer) return;
 
@@ -117,7 +120,8 @@ namespace Assets.Scripts
             if (startMultiplayer)
             {
                 NetworkManager.GetComponent<NetworkManager>().StartServer();
-                _gameType = GameType.Multiplayer; ;
+                _gameType = GameType.Multiplayer;
+                ;
                 Debug.Log("Game/Server started");
 
             }
@@ -140,7 +144,7 @@ namespace Assets.Scripts
 
 
 
-        private void Update()
+        void Update()
         {
             if (!_isGameStarted) return;
 
@@ -164,13 +168,7 @@ namespace Assets.Scripts
 
             if (EnemiesKilled == TotalNumEnemies)
             {
-                //Application.LoadLevel(0);
-                //LevelManager.SetActive(true);
-
-                //LevelManager.GetComponent<TextMesh>().text +=" 2";
-
-                EnemiesSpawned = 0;
-                SwarmEnemy();
+                StartCoroutine(NewLevel());
             }
         }
 
@@ -178,8 +176,23 @@ namespace Assets.Scripts
 
         #region [ Private Class ]
 
+        private IEnumerator NewLevel()
+        {
+            //Application.LoadLevel(0);
+            LevelManager.SetActive(true);
+            EnemiesKilled = 0;
+            EnemiesSpawned = 0;
 
+            LevelManager.GetComponent<TextMesh>().text += " 2";
+            yield return new WaitForSeconds(3);
+            LevelManager.SetActive(false);
 
+            SwarmEnemy();
+
+        }
         #endregion
     }
+
+        
 }
+
