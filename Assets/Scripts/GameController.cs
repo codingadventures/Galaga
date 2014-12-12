@@ -25,12 +25,13 @@ namespace Assets.Scripts
         public Transform SpawnValues;
         public float SpawnTime;
         public int TotalNumEnemies;
-        public Stack<int> Positions;
+        public List<Stack<int>> Positions;
 
         #endregion
 
         #region [ Private Fields  ]
-
+        private const String _levelText = "Level {0}";
+        private int _level = 1;
         private float _btnX, _btnY, _btnW, _btnH;
         private float _spawnDeltaTime;
         private GameType _gameType;
@@ -97,15 +98,7 @@ namespace Assets.Scripts
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
             LevelManager.SetActive(false);
-            Positions = new Stack<int>();
-            for (var i = 7; i > 0; i--)
-            {
-                if (i > 0)
-                {
-                    Positions.Push(-i);
-                }
-                Positions.Push(i);
-            }
+            FillFormationPositions();
         }
 
 
@@ -183,16 +176,33 @@ namespace Assets.Scripts
             EnemiesKilled = 0;
             EnemiesSpawned = 0;
 
-            LevelManager.GetComponent<TextMesh>().text += " 2";
-            yield return new WaitForSeconds(3);
+            LevelManager.GetComponent<TextMesh>().text = string.Format(_levelText, ++_level);
+            yield return new WaitForSeconds(1);
             LevelManager.SetActive(false);
 
             SwarmEnemy();
 
         }
+
+        public void FillFormationPositions()
+        {
+            Positions = new List<Stack<int>>();
+            for (int i = 0; i < 3; i++)
+            {
+                Positions[i] = new Stack<int>();
+                for (var j = 7; j > 0; j--)
+                {
+                    if (i > 0)
+                    {
+                        Positions[i].Push(-j);
+                    }
+                    Positions[i].Push(j);
+                }
+            }
+        }
         #endregion
     }
 
-        
+
 }
 

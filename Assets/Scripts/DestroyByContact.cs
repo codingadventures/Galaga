@@ -37,6 +37,7 @@ namespace Assets.Scripts
                     GameObjectController.Instantiate(Explosion, transform.position, transform.rotation);
                 
                 Debug.Log(other.name);
+
                 if (gameObject.tag.Equals("Enemy"))
                     _gameControllerObject.EnemiesKilled++;
 
