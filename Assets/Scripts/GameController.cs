@@ -23,10 +23,12 @@ namespace Assets.Scripts
         public GameObject PurpleEnemy;
         public GameObject RedEnemy;
         public GameObject LevelManager;
+        public GameObject Score;
         public Transform SpawnValues;
         public float SpawnTime;
         public float TimeBetweenSpawns;
         public int TotalNumEnemies;
+        public int EnemiesPerSwarm;
         public List<Stack<int>> Positions;
         public int EnemiesSpawnedPerSwarm { get; private set; }
 
@@ -36,6 +38,7 @@ namespace Assets.Scripts
         private System.Random _random = new System.Random();
 
         private const String _levelText = "Level {0}";
+        private const String _ScoreText = "Score {0}";
         private int _level = 1;
         private float _btnX, _btnY, _btnW, _btnH;
         private float _spawnDeltaTime;
@@ -43,6 +46,7 @@ namespace Assets.Scripts
         private GameType _gameType;
         private bool _isGameStarted;
         private int _totalEnemiesSwarmed;
+        private int _score;
         public int EnemiesKilled { get; set; }
 
         #endregion
@@ -58,7 +62,7 @@ namespace Assets.Scripts
             var number = _random.Next(-5, 5);
 
 
-            if (_spawnDeltaTime <= 0 && EnemiesSpawnedPerSwarm < TotalNumEnemies / 4 && _totalEnemiesSwarmed < TotalNumEnemies)
+            if (_spawnDeltaTime <= 0 && EnemiesSpawnedPerSwarm < EnemiesPerSwarm && _totalEnemiesSwarmed < TotalNumEnemies)
             {
                 var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                     SpawnValues.position.y, SpawnValues.position.z);
@@ -119,6 +123,7 @@ namespace Assets.Scripts
             _spawnDeltaTime = SpawnTime;
             _timeBetweenSpawns = TimeBetweenSpawns;
             LevelManager.SetActive(false);
+            Score.SetActive(false);
             FillFormationPositions();
         }
 
@@ -137,6 +142,7 @@ namespace Assets.Scripts
                 _gameType = GameType.Multiplayer;
                 ;
                 Debug.Log("Game/Server started");
+                Score.SetActive(true);
 
             }
 
@@ -144,6 +150,8 @@ namespace Assets.Scripts
             {
                 _gameType = GameType.Single;
                 _isGameStarted = true;
+                Score.SetActive(true);
+
                 SpawnPlayer();
             }
 
@@ -151,6 +159,8 @@ namespace Assets.Scripts
             {
                 NetworkManager.GetComponent<NetworkManager>().RefreshHost();
                 _gameType = GameType.Multiplayer;
+                Score.SetActive(true);
+
             }
 
             NetworkManager.GetComponent<NetworkManager>().GetAvailableGames(_btnX, _btnY, _btnW, _btnH);
@@ -161,7 +171,8 @@ namespace Assets.Scripts
         void Update()
         {
             if (!_isGameStarted) return;
-
+            
+            AddScore(0);
 
             switch (_gameType)
             {
@@ -180,7 +191,7 @@ namespace Assets.Scripts
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (EnemiesKilled == TotalNumEnemies)
+            if (EnemiesKilled >= TotalNumEnemies)
             {
                 StartCoroutine(NewLevel());
             }
@@ -198,9 +209,11 @@ namespace Assets.Scripts
             EnemiesSpawnedPerSwarm = 0;
             _totalEnemiesSwarmed = 0;
             LevelManager.GetComponent<TextMesh>().text = string.Format(_levelText, ++_level);
+            EnemiesPerSwarm += (_level * 2);
+            TotalNumEnemies += 5;
             yield return new WaitForSeconds(1);
             LevelManager.SetActive(false);
-
+            FillFormationPositions();
             SwarmEnemy();
 
         }
@@ -211,9 +224,9 @@ namespace Assets.Scripts
             for (int i = 0; i < 3; i++)
             {
                 var temp = new Stack<int>();
-                for (var j = 10; j > 0; j--)
+                for (var j = 9; j >= 0; j--)
                 {
-                    if (i > 0)
+                    if (j > 0)
                     {
                         temp.Push(-j);
                     }
@@ -223,6 +236,13 @@ namespace Assets.Scripts
             }
         }
         #endregion
+
+        public void AddScore(int score)
+        {
+            _score += score;
+
+            Score.GetComponent<TextMesh>().text = string.Format(_ScoreText, _score);
+        }
     }
 
 

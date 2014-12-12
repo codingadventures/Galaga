@@ -9,6 +9,7 @@ namespace Assets.Scripts
         public GameObject Explosion;
         public GameObject PlayerExplosion;
         private GameController _gameControllerObject;
+        public int ScoreValue;
 
         void Start()
         {
@@ -25,25 +26,36 @@ namespace Assets.Scripts
         }
         private void OnTriggerEnter(Collider other)
         {
-            if (other.tag.Equals("WorldBoundary") || other.tag == "Enemy")
+            if (other.tag.Equals("WorldBoundary") || other.tag == "Enemy" || other.tag == "EnemyRed" || other.tag == "EnemyBolt")
                 return;
-
-            if (other.tag.Equals("Player"))
-                GameObjectController.Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
 
             try
             {
-                if (Explosion != null)
-                    GameObjectController.Instantiate(Explosion, transform.position, transform.rotation);
-                
+                if (other.tag.Equals("Player") && (gameObject.tag.Equals("EnemyBolt") || gameObject.tag.Equals("Enemy") || gameObject.tag.Equals("EnemyRed")))
+                {
+                    GameObjectController.Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
+                    GameObjectController.Destroy(gameObject);
+                    GameObjectController.Destroy(other.gameObject);
+                    Debug.Log(string.Format("Destroyed By Contact - {0} Collided with {1}", gameObject.name, other.gameObject.name));
+
+                }
+
                 Debug.Log(other.name);
 
-                if (gameObject.tag.Equals("Enemy"))
+                if ((gameObject.tag.Equals("Enemy") || gameObject.tag.Equals("EnemyRed")) && other.tag.Equals("Bolt"))
+                {
                     _gameControllerObject.EnemiesKilled++;
+                    _gameControllerObject.AddScore(ScoreValue);
+                }
+
+                if (Explosion != null)
+                    GameObjectController.Instantiate(Explosion, transform.position, transform.rotation);
+
 
                 GameObjectController.Destroy(gameObject);
                 GameObjectController.Destroy(other.gameObject);
                 Debug.Log(string.Format("Destroyed By Contact - {0} Collided with {1}", gameObject.name, other.gameObject.name));
+               
             }
             catch (Exception e)
             {

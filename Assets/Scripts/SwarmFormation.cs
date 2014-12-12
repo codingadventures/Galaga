@@ -30,8 +30,14 @@ namespace Assets.Scripts
 
             Spline = new Spline();
             var random = new System.Random();
-            var splineNumber = random.Next(0, 3);
-
+            var splineNumber = random.Next(1, 3);
+            float offset = 0
+                ;
+            if (gameObject.tag == "EnemyRed")
+            {
+                splineNumber = 0;
+                offset = 0.5f;
+            }
             var path = ITweenPathGameObjects[splineNumber].GetComponent<iTweenPath>();
 
             Spline.AddKeyframe(-1, path.nodes[0]);
@@ -42,7 +48,11 @@ namespace Assets.Scripts
             }
             var vector = path.nodes[path.nodes.Count - 1];
             if (_gameControllerObject != null && _gameControllerObject.Positions != null && _gameControllerObject.Positions[splineNumber].Count > 0)
-                vector.x += _gameControllerObject.Positions[splineNumber].Pop();
+            {
+                var pos = _gameControllerObject.Positions[splineNumber].Pop();
+                vector.x += (pos + (pos * offset));
+            }
+
             Spline.AddKeyframe(t++, vector);
 
             Spline.AddKeyframe(t, path.nodes[path.nodes.Count - 1]);
