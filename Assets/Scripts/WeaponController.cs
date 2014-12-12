@@ -13,11 +13,19 @@ namespace Assets.Scripts
         void Start()
         {
             _swarmFormation = FindObjectOfType<SwarmFormation>();
-            InvokeRepeating("Fire", Delay, FireRate);
+            InvokeRepeating("FireOutFormation", Delay, FireRate);
+            InvokeRepeating("FireInFormation", Delay * 2, FireRate);
 
         }
 
-        void Fire()
+        void FireOutFormation()
+        {
+            if (_swarmFormation.InFormation) return;
+
+            GameObjectController.Instantiate(Shot, ShotSpawn.position, ShotSpawn.rotation);
+            audio.Play();
+        }
+        void FireInFormation()
         {
             if (!_swarmFormation.InFormation) return;
 
