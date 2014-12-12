@@ -20,23 +20,29 @@ namespace Assets.Scripts
         public GameObject NetworkManager;
         public GameObject Player1;
         public GameObject Player2;
-        public GameObject Hazard;
+        public GameObject PurpleEnemy;
+        public GameObject RedEnemy;
         public GameObject LevelManager;
         public Transform SpawnValues;
         public float SpawnTime;
+        public float TimeBetweenSpawns;
         public int TotalNumEnemies;
         public List<Stack<int>> Positions;
+        public int EnemiesSpawnedPerSwarm { get; private set; }
 
         #endregion
 
         #region [ Private Fields  ]
+        private System.Random _random = new System.Random();
+
         private const String _levelText = "Level {0}";
         private int _level = 1;
         private float _btnX, _btnY, _btnW, _btnH;
         private float _spawnDeltaTime;
+        private float _timeBetweenSpawns;
         private GameType _gameType;
         private bool _isGameStarted;
-        public int EnemiesSpawned { get; private set; }
+        private int _totalEnemiesSwarmed;
         public int EnemiesKilled { get; set; }
 
         #endregion
@@ -47,17 +53,31 @@ namespace Assets.Scripts
         {
 
             _spawnDeltaTime -= Time.deltaTime;
+            _timeBetweenSpawns -= Time.deltaTime;
 
-            if (_spawnDeltaTime <= 0 && EnemiesSpawned < TotalNumEnemies)
+            var number = _random.Next(-5, 5);
+
+
+            if (_spawnDeltaTime <= 0 && EnemiesSpawnedPerSwarm < TotalNumEnemies / 4 && _totalEnemiesSwarmed < TotalNumEnemies)
             {
-
                 var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                     SpawnValues.position.y, SpawnValues.position.z);
-                var enemy = GameObjectController.Instantiate(Hazard, spawnPosition, Quaternion.identity);
-                EnemiesSpawned++;
-
+            
+                if (number > 0)
+                    GameObjectController.Instantiate(PurpleEnemy, spawnPosition, Quaternion.identity);
+                else
+                    GameObjectController.Instantiate(RedEnemy, spawnPosition, Quaternion.identity);
+                
+                EnemiesSpawnedPerSwarm++;
+                _totalEnemiesSwarmed++;
                 _spawnDeltaTime = SpawnTime;
             }
+
+            if (_timeBetweenSpawns <= 0)
+                EnemiesSpawnedPerSwarm = 0;
+
+
+
 
         }
 
@@ -97,6 +117,7 @@ namespace Assets.Scripts
             _btnW = 100f;
             _btnH = 50f;
             _spawnDeltaTime = SpawnTime;
+            _timeBetweenSpawns = TimeBetweenSpawns;
             LevelManager.SetActive(false);
             FillFormationPositions();
         }
@@ -174,8 +195,8 @@ namespace Assets.Scripts
             //Application.LoadLevel(0);
             LevelManager.SetActive(true);
             EnemiesKilled = 0;
-            EnemiesSpawned = 0;
-
+            EnemiesSpawnedPerSwarm = 0;
+            _totalEnemiesSwarmed = 0;
             LevelManager.GetComponent<TextMesh>().text = string.Format(_levelText, ++_level);
             yield return new WaitForSeconds(1);
             LevelManager.SetActive(false);
@@ -189,15 +210,16 @@ namespace Assets.Scripts
             Positions = new List<Stack<int>>();
             for (int i = 0; i < 3; i++)
             {
-                Positions[i] = new Stack<int>();
-                for (var j = 7; j > 0; j--)
+                var temp = new Stack<int>();
+                for (var j = 10; j > 0; j--)
                 {
                     if (i > 0)
                     {
-                        Positions[i].Push(-j);
+                        temp.Push(-j);
                     }
-                    Positions[i].Push(j);
+                    temp.Push(j);
                 }
+                Positions.Add(temp);
             }
         }
         #endregion
