@@ -31,7 +31,9 @@ namespace Assets.Scripts
         public int EnemiesPerSwarm;
         public List<Stack<int>> Positions;
         public int EnemiesSpawnedPerSwarm { get; private set; }
-
+        public int TimeToRespawn;
+        public float _timeBetweenPlayerSpawn;
+        public bool IsPlayerAlive { get; set; }
         #endregion
 
         #region [ Private Fields  ]
@@ -66,12 +68,12 @@ namespace Assets.Scripts
             {
                 var spawnPosition = new Vector3(Random.Range(-SpawnValues.position.x, SpawnValues.position.x),
                     SpawnValues.position.y, SpawnValues.position.z);
-            
+
                 if (number > 0)
                     GameObjectController.Instantiate(PurpleEnemy, spawnPosition, Quaternion.identity);
                 else
                     GameObjectController.Instantiate(RedEnemy, spawnPosition, Quaternion.identity);
-                
+
                 EnemiesSpawnedPerSwarm++;
                 _totalEnemiesSwarmed++;
                 _spawnDeltaTime = SpawnTime;
@@ -85,9 +87,10 @@ namespace Assets.Scripts
 
         }
 
-        private void SpawnPlayer()
+        public void SpawnPlayer()
         {
             GameObjectController.Instantiate(Player1, new Vector3(0, 0), Quaternion.identity, 0);
+            IsPlayerAlive = true;
         }
 
         #endregion
@@ -125,6 +128,7 @@ namespace Assets.Scripts
             LevelManager.SetActive(false);
             Score.SetActive(false);
             FillFormationPositions();
+            _timeBetweenPlayerSpawn = TimeToRespawn;
         }
 
 
@@ -171,8 +175,19 @@ namespace Assets.Scripts
         void Update()
         {
             if (!_isGameStarted) return;
-            
+
             AddScore(0);
+
+            if (!IsPlayerAlive)
+            {
+                _timeBetweenPlayerSpawn -= Time.deltaTime;
+                if (_timeBetweenPlayerSpawn <= 0)
+                {
+                    SpawnPlayer();
+                    _timeBetweenPlayerSpawn = TimeBetweenSpawns;
+
+                }
+            }
 
             switch (_gameType)
             {

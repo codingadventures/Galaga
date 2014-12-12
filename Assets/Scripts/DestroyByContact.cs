@@ -34,10 +34,10 @@ namespace Assets.Scripts
                 if (other.tag.Equals("Player") && (gameObject.tag.Equals("EnemyBolt") || gameObject.tag.Equals("Enemy") || gameObject.tag.Equals("EnemyRed")))
                 {
                     GameObjectController.Instantiate(PlayerExplosion, other.transform.position, other.transform.rotation);
-                    GameObjectController.Destroy(gameObject);
-                    GameObjectController.Destroy(other.gameObject);
+                    //GameObjectController.Destroy(gameObject);
+                    //GameObjectController.Destroy(other.gameObject);
                     Debug.Log(string.Format("Destroyed By Contact - {0} Collided with {1}", gameObject.name, other.gameObject.name));
-
+                    _gameControllerObject.IsPlayerAlive = false;
                 }
 
                 Debug.Log(other.name);
